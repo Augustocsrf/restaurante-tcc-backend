@@ -24,12 +24,6 @@ Route::get('clients/{id}/addresses', 'AddressController@findByUser'); //Encontra
 Route::post('addresses', 'AddressController@create'); //Criar um novo endereço
 Route::delete('addresses/{id}', 'AddressController@delete'); //Deletar um endereço
 
-//Categorias
-Route::get('categories', 'CategoryController@index'); //Obter lista de categorias
-Route::post('categories', 'CategoryController@create'); //Criar categoria
-Route::put('categories/{id}', 'CategoryController@updateCategory'); //Atualizar categoria indicada
-Route::delete('categories/{id}', 'CategoryController@deleteCategory'); //Deletar categoria indicada
-
 //Rotas para pedidos
 Route::get('clients/{id}/open-orders', 'OrderController@getClientOpenOrders'); //Método para obter os pedidos do cliente que ainda estão em aberto
 Route::get('orders/open-orders', 'OrderController@getOpenOrders'); //Método para obter os pedidos do cliente que ainda estão em aberto
@@ -62,6 +56,12 @@ Route::middleware('EnsureTokenIsValid:admin')->group(function() {
     Route::post('items', 'ItemController@create'); //Criar novo item
     Route::put('items/{id}', 'ItemController@update'); //Atualizar item
     Route::delete('items/{id}', 'ItemController@delete'); //Deletar item
+
+    //Categorias
+    Route::get('categories', 'CategoryController@index'); //Obter lista de categorias
+    Route::post('categories', 'CategoryController@create'); //Criar categoria
+    Route::put('categories/{id}', 'CategoryController@updateCategory'); //Atualizar categoria indicada
+    Route::delete('categories/{id}', 'CategoryController@deleteCategory'); //Deletar categoria indicada
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {

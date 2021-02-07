@@ -11,7 +11,7 @@ class CategoryController extends Controller
     //Método para obter a lista de todas as categorias completas
     public function index()
     {
-        $categories = Category::get()->toJson(JSON_PRETTY_PRINT);
+        $categories = Category::orderBy('name')->get();
         return response($categories, 200);
     }
 
@@ -72,18 +72,9 @@ class CategoryController extends Controller
     {
         $category = new Category;
         $category->name = $request->name;
-        $category->active = $request->active;
+        $category->active = 1;
         $category->save();
 
-        return response()->json([
-            "message" => "category record created"
-        ], 201);
-    }
-
-    public function test(Request $request){
-        return response()->json([
-            'request' => $request->user,
-            "message" => "category record created"
-        ], 201);
+        return response()->json($category, 201);
     }
 }

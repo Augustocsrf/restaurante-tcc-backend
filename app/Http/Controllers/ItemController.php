@@ -58,9 +58,13 @@ class ItemController extends Controller
         $item->category_id = $request->categoryId;
         $item->save();
 
-        return response()->json([
-            "message" => "Item criado"
-        ], 201);
+        $newItem = DB::table('items')
+        ->join('categories', 'categories.id', '=', 'items.category_id')
+        ->select('items.*', 'categories.active as category_active', 'categories.name as category_name')
+        ->where('items.id', $item->id)
+        ->first();
+
+        return response()->json($newItem, 201);
     }
 
     //Método para editar um item
@@ -73,12 +77,19 @@ class ItemController extends Controller
             $item->description = is_null($request->description) ? $item->description : $request->description;
             $item->price = is_null($request->price) ? $item->price : $request->price;
             $item->active = is_null($request->active) ? $item->active : $request->active;
-            $item->category_id = is_null($request->category_id) ? $item->category_id : $request->categoryId;
+            $item->category_id = is_null($request->categoryId) ? $item->category_id : $request->categoryId;
 
             $item->save();
 
+            $editedItem = DB::table('items')
+                ->join('categories', 'categories.id', '=', 'items.category_id')
+                ->select('items.*', 'categories.active as category_active', 'categories.name as category_name')
+                ->where('items.id', $item->id)
+                ->first();
+
             return response()->json([
-                "message" => "Atualizado com sucesso"
+                "message" => "Atualizado com sucesso",
+                'item' => $editedItem,
             ], 200);
         } else {
             return response()->json([
