@@ -62,6 +62,11 @@ Route::middleware('EnsureTokenIsValid:admin')->group(function() {
     Route::post('categories', 'CategoryController@create'); //Criar categoria
     Route::put('categories/{id}', 'CategoryController@updateCategory'); //Atualizar categoria indicada
     Route::delete('categories/{id}', 'CategoryController@deleteCategory'); //Deletar categoria indicada
+
+    //Funcionários
+    Route::get('staff', 'StaffController@index'); //Obter lista de funcionários
+    Route::put('staff/{id}', 'StaffController@update'); //Deletar funcionário
+    Route::delete('staff/{id}', 'StaffController@delete'); //Deletar funcionário
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {

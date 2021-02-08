@@ -69,7 +69,7 @@ class RegisterController extends Controller
         if(User::where('email', $data->email)->exists()){
             return response()->json([ "message" => "Email já existe" ], 409);
         }
-        
+
         $user = User::create([
             'name' => $data->name,
             'lastName' => $data->lastName,
@@ -85,7 +85,7 @@ class RegisterController extends Controller
 
     protected function createEmployee(Request $data)
     {
-        return User::create([
+        $user = User::create([
             'name' => $data->name,
             'lastName' => $data->lastName,
             'email' => $data->email,
@@ -94,5 +94,7 @@ class RegisterController extends Controller
             'password' => Hash::make($data->password),
             'api_token' => Str::random(60),
         ]);
+
+        return response()->json($user, 201);
     }
 }
