@@ -10,10 +10,10 @@ use Illuminate\Http\Request;
 class ReservationController extends Controller
 {
     public function index(){
-        $reservations = Reservation::get(); 
+        $reservations = Reservation::get();
         return response($reservations, 200);
     }
-    
+
     public function create(Request $request){
         $reservation = new Reservation;
 
@@ -23,20 +23,20 @@ class ReservationController extends Controller
         $reservation->lastName = $request->lastName;
         $reservation->guests = $request->guests;
         $reservation->client_id = $request->clientId;
-        
+
         $reservation->save();
 
         return response()->json([
             "message" => "Reserva criada"
         ], 201);
     }
-    
+
     public function update(Request $request, $id){
         if (Reservation::where('id', $id)->exists()) {
             $reservation = Reservation::find($id);
-            
+
             $reservation->reservation_status = is_null($request->status) ? $reservation->reservation_status : $request->status;
-            
+
             $reservation->save();
 
             return response()->json([
@@ -54,7 +54,7 @@ class ReservationController extends Controller
             ->select('day', DB::raw('count(*) as occupation'))
             ->groupBy('day')
             ->get();
-             
+
         return response($reservations, 200);
     }
 
@@ -70,9 +70,11 @@ class ReservationController extends Controller
     public function getOpenReservations(){
         $reservations = Reservation::where([
             ['reservation_status', 1]
-            ])
+        ])
         ->join('reservation_statuses', 'reservations.reservation_status', '=', 'reservation_statuses.id')
         ->select('reservations.*', 'reservation_statuses.name as status_name')
+        ->orderBy('day', 'asc')
+        ->orderBy('time', 'asc')
         ->get();
 
         return response()->json($reservations, 200);

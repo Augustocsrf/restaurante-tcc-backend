@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,35 +20,38 @@ Route::post('login/google', 'Auth\LoginController@googleLogin');
 Route::post('login/staff', 'Auth\LoginController@staffLogin');
 Route::post('register', 'Auth\RegisterController@create');
 
-//Rotas para Controller de Endereços
-Route::get('clients/{id}/addresses', 'AddressController@findByUser'); //Encontrar endereços de um cliente
-Route::post('addresses', 'AddressController@create'); //Criar um novo endereço
-Route::delete('addresses/{id}', 'AddressController@delete'); //Deletar um endereço
-
-//Rotas para pedidos
-Route::get('clients/{id}/open-orders', 'OrderController@getClientOpenOrders'); //Método para obter os pedidos do cliente que ainda estão em aberto
-Route::get('orders/open-orders', 'OrderController@getOpenOrders'); //Método para obter os pedidos do cliente que ainda estão em aberto
-Route::post('orders', 'OrderController@create'); //Criar pedido
-Route::put('orders/{id}', 'OrderController@update'); //Atualizar pedido
-
 //Reservas
 Route::get('reservations', 'ReservationController@index');
 Route::get('reservations/occupation', 'ReservationController@getBusyDays');
-Route::get('clients/{id}/open-reservations', 'ReservationController@getClientOpenReservations'); //Obter reservas em aberto de um cliente
 Route::post('reservations', 'ReservationController@create');
 
 Route::get('menu', 'CategoryController@getMenu'); //Obter cardápio
 
 Route::middleware('EnsureTokenIsValid')->group(function() {
-    Route::put('reservations/{id}', 'ReservationController@update');
+    Route::put('reservations/{id}', 'ReservationController@update'); //Atualizar reserva
+
+    Route::post('orders', 'OrderController@create'); //Criar pedido
+    Route::put('orders/{id}', 'OrderController@update'); //Atualizar pedido
+
+    //Rotas para tela de perfil do cliente
+    Route::get('clients/{id}/open-orders', 'OrderController@getClientOpenOrders'); //Método para obter os pedidos do cliente que ainda estão em aberto
+    Route::get('clients/{id}/open-reservations', 'ReservationController@getClientOpenReservations'); //Obter reservas em aberto de um cliente
+    Route::put('clients/{id}', 'ClientController@update'); //Atualizar informações do cliente
+
+    //Rotas para Controller de Endereços
+    Route::get('clients/{id}/addresses', 'AddressController@findByUser'); //Encontrar endereços de um cliente
+    Route::post('addresses', 'AddressController@create'); //Criar um novo endereço
+    Route::delete('addresses/{id}', 'AddressController@delete'); //Deletar um endereço
 });
 
 //Rotas protegidas apenas para funcionários e administradores
 Route::middleware('EnsureTokenIsValid:staff,admin')->group(function() {
     Route::get('reservations/open', 'ReservationController@getOpenReservations'); //Pegar reservas em aberto
     Route::get('reservations-statuses', 'ReservationController@getReservationStatuses'); //Pegar status das reservas
-});
 
+    Route::get('orders/open-orders', 'OrderController@getOpenOrders'); //Método para obter os pedidos do cliente que ainda estão em aberto
+    Route::get('order-status', 'OrderController@getOrderStatuses'); //Obter status de pedidos
+});
 
 //Rotas protegidas apenas para administradores
 Route::middleware('EnsureTokenIsValid:admin')->group(function() {
@@ -65,8 +69,17 @@ Route::middleware('EnsureTokenIsValid:admin')->group(function() {
 
     //Funcionários
     Route::get('staff', 'StaffController@index'); //Obter lista de funcionários
+    Route::post('staff', 'Auth\RegisterController@createEmployee'); //Registrar Usuário
     Route::put('staff/{id}', 'StaffController@update'); //Deletar funcionário
     Route::delete('staff/{id}', 'StaffController@delete'); //Deletar funcionário
+
+    //Reports
+    Route::get('reports/revenue', 'DataReportController@getOrderRevenue');
+    Route::get('reports/orders', 'DataReportController@getOrderAmount');
+    Route::get('reports/reservations', 'DataReportController@getReservationAmount');
+    Route::get('reports/items', 'DataReportController@getItemsOrdered');
+    Route::get('reports/clients', 'DataReportController@getNewClients');
+    Route::get('reports/deliveries', 'DataReportController@getDeliveryProportions');
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {

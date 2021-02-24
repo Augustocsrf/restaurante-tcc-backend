@@ -50,6 +50,12 @@ class ItemController extends Controller
     //Método para criar um novo item
     public function create(Request $request)
     {
+        if(Item::where('name', $request->name)->exists()){
+            return response()->json([
+                "message" => "Produto com esse nome já existe"
+            ], 409);
+        }
+
         $item = new Item;
         $item->name = $request->name;
         $item->description = $request->description;
@@ -70,6 +76,12 @@ class ItemController extends Controller
     //Método para editar um item
     public function update(Request $request, $id)
     {
+        if(Item::where('name', $request->name)->exists()){
+            return response()->json([
+                "message" => "Produto com esse nome já existe"
+            ], 409);
+        }
+
         if (Item::where('id', $id)->exists()) {
             $item = Item::find($id);
 

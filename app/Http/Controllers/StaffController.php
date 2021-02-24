@@ -51,7 +51,7 @@ class StaffController extends Controller
             ], 200);
         } else {
             return response()->json([
-                "message" => "Reserva não encontrada"
+                "message" => "Usuário indicado não existe"
             ], 404);
         }
     }

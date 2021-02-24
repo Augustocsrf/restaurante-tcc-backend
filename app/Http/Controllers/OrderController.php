@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Order;
 use App\OrderItem;
 use App\Address;
+use App\OrderStatus;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -21,10 +22,10 @@ class OrderController extends Controller
         $order->order_status_id = 1;
         $order->address_id = $request->deliveryAddressId;
         $order->client_id = $request->id;
-        
+
         $order->save();
 
-        
+
         //Criar lista de produtos pedidos
         foreach ($request->items as $item) {
             $orderItem = new OrderItem();
@@ -33,14 +34,12 @@ class OrderController extends Controller
             $orderItem->name = $item["name"];
             $orderItem->price = $item["price"];
             $orderItem->quantity = $item["quantity"];
-            
+
             $orderItem->item_id = $item["id"];
             $orderItem->order_id = $order->id;
-            
+
             $orderItem->save();
         }
-        
-        
 
         return response()->json([
             "order" => $order,
@@ -51,9 +50,9 @@ class OrderController extends Controller
     public function update(Request $request, $id){
         if (Order::where('id', $id)->exists()) {
             $order = Order::find($id);
-            
+
             $order->order_status_id = is_null($request->status) ? $order->order_status_id : $request->status;
-            
+
             $order->save();
 
             return response()->json([
@@ -65,7 +64,7 @@ class OrderController extends Controller
             ], 404);
         }
     }
-    
+
     //Método para obter os pedidos em aberto de um cliente
     public function getClientOpenOrders($id)
     {
@@ -73,42 +72,49 @@ class OrderController extends Controller
         ->join('order_statuses', 'orders.order_status_id', '=', 'order_statuses.id')
         ->select('orders.*', 'order_statuses.name as status_name')
         ->get();
-        
+
         foreach ($orders as $order) {
             $items = OrderItem::where('order_id', $order->id)->get();
 
             $order->items = $items;
-            
+
             if($order->address_id != null){
                 $address = Address::find($order->address_id);
                 $order->address = $address;
             }
         }
-        
-        
+
+
         return response()->json($orders, 200);
     }
 
-    //Método para obter todos os pedidos em aberto 
-    public function getOpenOrders($id)
+    //Método para obter todos os pedidos em aberto
+    public function getOpenOrders()
     {
-        $orders = Order::where(['order_status_id', "!=", 5])
+        $orders = Order::where('order_status_id', "!=", 5)
         ->join('order_statuses', 'orders.order_status_id', '=', 'order_statuses.id')
-        ->select('orders.*', 'order_statuses.name as status_name')
+        ->join('users', 'orders.client_id', '=', 'users.id')
+        ->select('orders.*', 'users.name', 'users.lastName', 'order_statuses.name as status_name')
         ->get();
-        
+
         foreach ($orders as $order) {
             $items = OrderItem::where('order_id', $order->id)->get();
 
             $order->items = $items;
-            
+
             if($order->address_id != null){
                 $address = Address::find($order->address_id);
                 $order->address = $address;
             }
         }
-        
-        
+
         return response()->json($orders, 200);
+    }
+
+    //Método para pegar os status possíveis de pedidos
+    public function getOrderStatuses(){
+        $orderStatuses = OrderStatus::get();
+
+        return response()->json($orderStatuses, 200);
     }
 }

@@ -35,6 +35,12 @@ class CategoryController extends Controller
     //Atualizar informações da categoria
     public function updateCategory(Request $request, $id)
     {
+        if(Category::where('name', $request->name)->exists()){
+            return response()->json([
+                "message" => "Categoria com esse nome já existe"
+            ], 409);
+        }
+
         if (Category::where('id', $id)->exists()) {
             $category = Category::find($id);
             $category->name = is_null($request->name) ? $category->name : $request->name;
@@ -70,6 +76,12 @@ class CategoryController extends Controller
     //Método para criar uma nova categoria
     public function create(Request $request)
     {
+        if(Category::where('name', $request->name)->exists()){
+            return response()->json([
+                "message" => "Categoria com esse nome já existe"
+            ], 409);
+        }
+
         $category = new Category;
         $category->name = $request->name;
         $category->active = 1;
