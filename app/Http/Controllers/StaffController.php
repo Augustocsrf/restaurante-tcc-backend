@@ -10,6 +10,7 @@ class StaffController extends Controller
     //Método para encontrar todos os funcionários
     public function index(){
         $staff = User::where('permission', 2)
+        ->select('name', 'lastName', 'email', 'phone', 'created_at', 'updated_at')
         ->orderBy('name')
         ->orderBy('lastName')
         ->get();
@@ -33,7 +34,7 @@ class StaffController extends Controller
         }
     }
 
-    //
+    //Método apra atualizar um funcionário
     public function update(Request $request, $id){
         if (User::where('id', $id)->exists()) {
             $staff = User::find($id);

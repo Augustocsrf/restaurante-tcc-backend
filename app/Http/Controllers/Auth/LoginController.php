@@ -43,25 +43,25 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
-    
+
     public function login(Request $request){
         // Get only email and password from request
         $credentials = $request->only('email', 'password');
-  
+
         // Get user by email
         $user = User::where('email', $credentials['email'])->first();
-  
+
         // Validate Company
         if(!$user) {
           return response()->json([
-            'error' => 'Invalid credentials'
+            'error' => 'Email ou Senha incorreto'
           ], 401);
         }
-        
+
         // Validate Password
         if (!Hash::check($credentials['password'], $user->password)) {
             return response()->json([
-              'error' => 'Invalid credentials password'
+              'error' => 'Email ou Senha incorreto'
             ], 401);
         }
 
@@ -71,19 +71,19 @@ class LoginController extends Controller
     public function clientLogin(Request $request){
         //Encontrar usuário com aquele email único na categoria cliente
         $userExists = User::where([
-            ['email', $request->email], 
+            ['email', $request->email],
             ["permission", 1]
             ])
                     ->exists();
-                
+
         if($userExists){
             $user = User::where([
-                ['email', $request->email], 
+                ['email', $request->email],
                 ["permission", 1]
                 ])
                         ->first();
 
-                
+
             if($user && Hash::check($request->password, $user->password)){
                 return response()->json($user, 200);
             } else {
@@ -91,7 +91,7 @@ class LoginController extends Controller
                     "message" => "Email ou senha incorretos"
                 ], 404);
             }
-            
+
         } else {
             return response()->json([
                 "message" => "Email incorreto"
@@ -103,19 +103,19 @@ class LoginController extends Controller
         //Fazer o hash da senha
         $password = Hash::make($request->password);
         $userExists = User::where([
-            ['email', $request->email], 
+            ['email', $request->email],
             ["permission", '!=', 1]
             ])
                     ->exists();
 
         if($userExists){
             $user = User::where([
-                ['email', $request->email], 
+                ['email', $request->email],
                 ["permission", '!=', 1]
                 ])
                         ->first();
 
-                
+
             if($user && Hash::check($request->password, $user->password)){
                 return response()->json($user, 200);
             } else {
@@ -134,12 +134,12 @@ class LoginController extends Controller
     public function googleLogin(Request $request){
         //Encontrar usuário com aquele email único
         $userExists = User::where('email', $request->email)->exists();
-                
-        //Caso o usuário exista, 
+
+        //Caso o usuário exista,
         if($userExists){
             $user = User::where('email', $request->email)->first();
 
-                
+
             if($user && Hash::check($request->password, $user->password)){
                 return response()->json($user, 200);
             } else {
@@ -147,7 +147,7 @@ class LoginController extends Controller
                     "message" => "Email ou senha incorretos. Email pode já estar cadastrado sem login pela google."
                 ], 404);
             }
-            
+
         } else {
             //Caso o usuário não exista, criar um usuário com essas informações na categoria de cliente
             $user = User::create([
@@ -159,7 +159,7 @@ class LoginController extends Controller
                 'password' => Hash::make($request->password),
                 'api_token' => Str::random(60),
             ]);
-    
+
             return response()->json($user, 201);
         }
     }

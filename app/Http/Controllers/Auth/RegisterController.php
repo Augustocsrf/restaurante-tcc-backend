@@ -83,17 +83,38 @@ class RegisterController extends Controller
         return response()->json($user, 201);
     }
 
+    //Método para criar um novo funcionário
     protected function createEmployee(Request $data)
     {
-        $user = User::create([
-            'name' => $data->name,
-            'lastName' => $data->lastName,
-            'email' => $data->email,
-            'phone' => $data->phone,
-            'permission' => 2,
-            'password' => Hash::make($data->password),
-            'api_token' => Str::random(60),
-        ]);
+        //Verificar se o usuário com esse email já existe,
+        // caso ele já exista, e o administrador não tenha dado permissão pra atualizar esse usuário, retornar erro
+        // Caso haja essa permissão atualizar o usuário existente para ser um funcionário
+        // Caso o email não exista, criar um novo funcionário
+        if(User::where('email', $data->email)->exists()){
+            if($data->allowUpdate){
+                $user = User::where('email', $data->email)->first();
+
+                $user->permission = 2;
+                $user->save();
+
+                return response()->json($user, 200);
+            } else {
+                return response()->json([
+                    "message" => "Email já existe. Você gostaria de atualizar o usuário com esse email?",
+                    "requestConfirmation" => true
+                ], 204);
+            }
+        } else {
+            $user = User::create([
+                'name' => $data->name,
+                'lastName' => $data->lastName,
+                'email' => $data->email,
+                'phone' => $data->phone,
+                'permission' => 2,
+                'password' => Hash::make($data->password),
+                'api_token' => Str::random(60),
+            ]);
+        }
 
         return response()->json($user, 201);
     }

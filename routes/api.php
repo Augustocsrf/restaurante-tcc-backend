@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 //Rotas de Usuário
+Route::post('login', 'Auth\LoginController@login');
 Route::post('login/client', 'Auth\LoginController@clientLogin');
 Route::post('login/google', 'Auth\LoginController@googleLogin');
 Route::post('login/staff', 'Auth\LoginController@staffLogin');
@@ -36,7 +37,9 @@ Route::middleware('EnsureTokenIsValid')->group(function() {
     //Rotas para tela de perfil do cliente
     Route::get('clients/{id}/open-orders', 'OrderController@getClientOpenOrders'); //Método para obter os pedidos do cliente que ainda estão em aberto
     Route::get('clients/{id}/open-reservations', 'ReservationController@getClientOpenReservations'); //Obter reservas em aberto de um cliente
+
     Route::put('clients/{id}', 'ClientController@update'); //Atualizar informações do cliente
+    Route::put('clients/{id}/password', 'ClientController@updatePassword'); //Atualizar senha do cliente
 
     //Rotas para Controller de Endereços
     Route::get('clients/{id}/addresses', 'AddressController@findByUser'); //Encontrar endereços de um cliente
@@ -69,7 +72,7 @@ Route::middleware('EnsureTokenIsValid:admin')->group(function() {
 
     //Funcionários
     Route::get('staff', 'StaffController@index'); //Obter lista de funcionários
-    Route::post('staff', 'Auth\RegisterController@createEmployee'); //Registrar Usuário
+    Route::post('staff', 'Auth\RegisterController@createEmployee'); //Registrar funcionário
     Route::put('staff/{id}', 'StaffController@update'); //Deletar funcionário
     Route::delete('staff/{id}', 'StaffController@delete'); //Deletar funcionário
 
