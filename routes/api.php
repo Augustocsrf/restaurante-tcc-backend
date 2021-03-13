@@ -29,6 +29,7 @@ Route::post('reservations', 'ReservationController@create');
 Route::get('menu', 'CategoryController@getMenu'); //Obter cardápio
 
 Route::middleware('EnsureTokenIsValid')->group(function() {
+    Route::put('confirm-email', 'Auth\VerificationController@verifyUserCode'); //Método para verificar o email cadastrado
     Route::put('reservations/{id}', 'ReservationController@update'); //Atualizar reserva
 
     Route::post('orders', 'OrderController@create'); //Criar pedido

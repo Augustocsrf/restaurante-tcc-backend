@@ -27,7 +27,9 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('permission')
                     ->default(1)
                     ->comment("1 - Cliente; 2 - Funcionárion; 3 - Admin");
-            
+            $table->string('google_id')
+                    ->nullable();
+
             $table->rememberToken();
             $table->timestamps();
         });

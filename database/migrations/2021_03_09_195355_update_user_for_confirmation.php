@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class UpdateUserTableApiToken extends Migration
+class UpdateUserForConfirmation extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class UpdateUserTableApiToken extends Migration
      */
     public function up()
     {
-        //
         Schema::table('users', function ($table) {
-            $table->string('api_token', 80)
-                ->after('password')
+            $table->dropColumn('remember_token');
+
+            $table->string('confirmation_token', 6)
+                ->after('permission')
                 ->unique()
                 ->nullable()
                 ->default(null);
@@ -30,9 +31,10 @@ class UpdateUserTableApiToken extends Migration
      */
     public function down()
     {
-        //
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('api_token');
+        Schema::table('users', function ($table) {
+            $table->dropColumn('confirmation_token');
+
+            $table->rememberToken();
         });
     }
 }

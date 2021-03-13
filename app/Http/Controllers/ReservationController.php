@@ -15,6 +15,15 @@ class ReservationController extends Controller
     }
 
     public function create(Request $request){
+        //Verificar se uma reserva com o mesmo tempo, dia, e usuário já existe
+        // Se sim, retornar um erro por conflito
+        if(Reservation::where([['day', $request->day], ['time', $request->time], ['client_id', $request->clientId]])->exists()){
+            return response()->json([
+                "message" => "Reserva para este usuário, nessa hora e dia já existe"
+            ], 409);
+        }
+
+
         $reservation = new Reservation;
 
         $reservation->day = $request->day;
@@ -51,8 +60,12 @@ class ReservationController extends Controller
 
     public function getBusyDays(){
         $reservations = Reservation::where('reservation_status', 1)
-            ->select('day', DB::raw('count(*) as occupation'))
+            ->select('day', 'time')
             ->groupBy('day')
+            ->groupBy('time')
+            ->orderBy('day')
+            ->orderBy('time')
+            ->havingRaw('count(*) >= 4')
             ->get();
 
         return response($reservations, 200);

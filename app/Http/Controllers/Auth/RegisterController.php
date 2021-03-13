@@ -66,9 +66,14 @@ class RegisterController extends Controller
      */
     protected function create(Request $data)
     {
+        //Verificar se email informado já existe
         if(User::where('email', $data->email)->exists()){
             return response()->json([ "message" => "Email já existe" ], 409);
         }
+
+        // Criar código único para o token de confirmação do email
+        $u = uniqid();
+        $code = substr(strtoupper($u),7);
 
         $user = User::create([
             'name' => $data->name,
@@ -76,9 +81,25 @@ class RegisterController extends Controller
             'email' => $data->email,
             'phone' => $data->phone,
             'permission' => $data->permission,
+            'confirmation_token' => $code,
             'password' => Hash::make($data->password),
             'api_token' => Str::random(60),
         ]);
+
+        //Enviar e-mail para
+        $headerFields = array(
+            "From: noreply@restaurantetcc.com.br",
+            "Content-Type: text/html;charset=utf-8"
+        );
+
+        mail(
+            $user->email,
+            "Recuperação de Senha",
+            "Olá, " . $user->name . "<br>"
+            . "Você se cadastrou no site RestauranteTCC.<br>"
+            . "Para confirmar esse email, utilize o código <strong>" . $code . "</strong>.",
+            implode("\r\n", $headerFields)
+        );
 
         return response()->json($user, 201);
     }

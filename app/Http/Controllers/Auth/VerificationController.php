@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
+
 class VerificationController extends Controller
 {
     /*
@@ -37,5 +41,31 @@ class VerificationController extends Controller
         $this->middleware('auth');
         $this->middleware('signed')->only('verify');
         $this->middleware('throttle:6,1')->only('verify', 'resend');
+    }
+
+    public function verifyUserCode(Request $request){
+        $userExists = User::where([
+            ['confirmation_token', $request->code],
+            ['id', $request->user->id]
+        ])->exists();
+
+        if($userExists){
+            $user = $userExists = User::where([
+                ['confirmation_token', $request->code],
+                ['id', $request->user->id]
+            ])->first();
+
+            $user->emaiL_verified_at = new Date();
+
+            $user->save();
+
+            return response()->json([
+                "message" => "Email confirmado"
+            ], 200);
+        } else{
+            return response()->json([
+                "message" => "Código inválido"
+            ], 404);
+        }
     }
 }
