@@ -110,7 +110,7 @@ class OrderController extends Controller
     //Método para obter todos os pedidos em aberto
     public function getOpenOrders()
     {
-        $orders = Order::where('order_status_id', "!=", 5)
+        $orders = Order::where([['order_status_id', "!=", 5], ['order_status_id', "!=", 6]])
         ->join('order_statuses', 'orders.order_status_id', '=', 'order_statuses.id')
         ->join('users', 'orders.client_id', '=', 'users.id')
         ->select('orders.*', 'users.name', 'users.lastName', 'order_statuses.name as status_name')
