@@ -6,7 +6,7 @@ use App\User;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Date;
+use Carbon\Carbon;
 use DateTime;
 
 class ClientController extends Controller
@@ -78,13 +78,13 @@ class ClientController extends Controller
                 ['id', $request->user->id]
             ])->first();
 
-            $user->emaiL_verified_at = $now->format('Y-m-d H:m:s');
+            $user->email_verified_at = Carbon::now();
 
             $user->save();
 
             return response()->json([
                 "message" => "Email confirmado",
-                "email_verified_at" => $now->format('Y-m-d H:m:s')
+                "email_verified_at" => Carbon::now(),
             ], 200);
         } else{
             return response()->json([

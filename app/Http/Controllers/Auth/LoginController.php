@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 use App\User;
+use Carbon\Carbon;
 
 class LoginController extends Controller
 {
@@ -54,14 +55,14 @@ class LoginController extends Controller
         // Validate Company
         if(!$user) {
           return response()->json([
-            'error' => 'Email ou Senha incorreto'
+            'message' => 'Senha ou email inválidos'
           ], 401);
         }
 
         // Validate Password
         if (!Hash::check($credentials['password'], $user->password)) {
             return response()->json([
-              'error' => 'Email ou Senha incorreto'
+                'message' => 'Senha ou email inválidos'
             ], 401);
         }
 
@@ -133,18 +134,17 @@ class LoginController extends Controller
     //Método para realizar login com uma conta google
     public function googleLogin(Request $request){
         //Encontrar usuário com aquele email único
-        $userExists = User::where('email', $request->email)->exists();
+        $userExists = User::where(['email', $request->email])->exists();
 
-        //Caso o usuário exista,
+        //Caso o usuário exista, verificar se este tem a id da google que o usuário tem
         if($userExists){
-            $user = User::where('email', $request->email)->first();
+            $user = User::where(([['email', $request->email], ['google_id', $request->password]]))->first();
 
-
-            if($user && Hash::check($request->password, $user->password)){
+            if($user){
                 return response()->json($user, 200);
             } else {
                 return response()->json([
-                    "message" => "Email ou senha incorretos. Email pode já estar cadastrado sem login pela google."
+                    "message" => "Email não está cadastrado pela google. Entre utilizando a senha."
                 ], 404);
             }
 
@@ -158,6 +158,8 @@ class LoginController extends Controller
                 'permission' => 1,
                 'password' => Hash::make($request->password),
                 'api_token' => Str::random(60),
+                'email_verified_at' => Carbon::now(),
+                'google_id' => $request->googleId,
             ]);
 
             return response()->json($user, 201);

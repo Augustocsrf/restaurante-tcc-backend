@@ -18,13 +18,20 @@ class CategoryController extends Controller
     //Método para obter o cardápio, com categorias e a lista de items em cada categoria
     public function getMenu()
     {
-        $categories = Category::where('active', 1)->orderBy('name', 'ASC')->get();
+        $categories = Category::select('id', 'name')
+            ->where('active', 1)
+            ->orderBy('name', 'ASC')
+            ->get();
 
         foreach ($categories as $category) {
-            $items = Item::where([
+            $items = Item::
+            select('id', 'name', 'description', 'price')
+            ->where([
                 ['active', '=', '1'],
                 ['category_id', '=', $category->id],
-            ])->get();
+            ])
+            ->orderBy('name', 'ASC')
+            ->get();
 
             $category->items = $items;
         }

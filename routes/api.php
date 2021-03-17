@@ -16,20 +16,23 @@ use Illuminate\Support\Facades\Route;
 
 //Rotas de Usuário
 Route::post('login', 'Auth\LoginController@login');
-Route::post('login/client', 'Auth\LoginController@clientLogin');
 Route::post('login/google', 'Auth\LoginController@googleLogin');
-Route::post('login/staff', 'Auth\LoginController@staffLogin');
 Route::post('register', 'Auth\RegisterController@create');
+Route::put('clients/{id}/password', 'ClientController@updatePassword'); //Atualizar senha do cliente
+
+Route::post('recover-code', 'Auth\ForgotPasswordController@requestCode');
+Route::post('verify-code', 'Auth\ForgotPasswordController@verifyCode');
 
 //Reservas
 Route::get('reservations', 'ReservationController@index');
 Route::get('reservations/occupation', 'ReservationController@getBusyDays');
 Route::post('reservations', 'ReservationController@create');
 
-Route::get('menu', 'CategoryController@getMenu'); //Obter cardápio
+// Route::get('menu', 'CategoryController@getMenu'); //Obter cardápio
+Route::get('available-menu', 'CategoryController@getMenu'); //Obter cardápio
 
 Route::middleware('EnsureTokenIsValid')->group(function() {
-    Route::put('confirm-email', 'Auth\VerificationController@verifyUserCode'); //Método para verificar o email cadastrado
+    Route::put('confirm-email-user', 'ClientController@verifyUserCode'); //Método para verificar o email cadastrado
     Route::put('reservations/{id}', 'ReservationController@update'); //Atualizar reserva
 
     Route::post('orders', 'OrderController@create'); //Criar pedido
@@ -38,9 +41,7 @@ Route::middleware('EnsureTokenIsValid')->group(function() {
     //Rotas para tela de perfil do cliente
     Route::get('clients/{id}/open-orders', 'OrderController@getClientOpenOrders'); //Método para obter os pedidos do cliente que ainda estão em aberto
     Route::get('clients/{id}/open-reservations', 'ReservationController@getClientOpenReservations'); //Obter reservas em aberto de um cliente
-
     Route::put('clients/{id}', 'ClientController@update'); //Atualizar informações do cliente
-    Route::put('clients/{id}/password', 'ClientController@updatePassword'); //Atualizar senha do cliente
 
     //Rotas para Controller de Endereços
     Route::get('clients/{id}/addresses', 'AddressController@findByUser'); //Encontrar endereços de um cliente

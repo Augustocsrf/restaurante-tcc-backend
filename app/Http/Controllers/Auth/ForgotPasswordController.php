@@ -39,11 +39,18 @@ class ForgotPasswordController extends Controller
 
     public function requestCode(Request $request){
         // Verificar se email informado está cadastrado
-        $userExists = User::where([['email', $request->email]])
+        $userExists = User::where([
+                ['email', $request->email],
+                ['google_id', null],
+            ])
             ->exists();
 
         if($userExists){
-            $user = User::where([['email', $request->email]])->first();
+            $user = User::where([
+                ['email', $request->email],
+                ['google_id', null],
+            ])
+            ->first();
 
             $u = uniqid();
             $code = substr(strtoupper($u),7);
@@ -65,7 +72,6 @@ class ForgotPasswordController extends Controller
             $recoverPassword = RecoverPasswordCode::create([
                 'code' => $code,
                 'users_id' => $user->id,
-
             ]);
 
             return response()->json([
@@ -75,6 +81,23 @@ class ForgotPasswordController extends Controller
         } else {
             return response()->json([
                 "message" => "Email não existe no sistema"
+            ], 404);
+        }
+    }
+
+    public function verifyCode(Request $request) {
+        $recoverCode = RecoverPasswordCode::where('code', $request->code)->exists();
+
+        if($recoverCode){
+            $recoverCode = RecoverPasswordCode::select('users_id', 'created_at')->where('code', $request->code)->first();
+
+            return response()->json([
+                "recoverCode" => $recoverCode,
+                "message" => "Código válido"
+            ], 200);
+        } else {
+            return response()->json([
+                "message" => "Código inválido"
             ], 404);
         }
     }

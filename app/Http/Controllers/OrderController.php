@@ -49,11 +49,30 @@ class OrderController extends Controller
 
     public function update(Request $request, $id){
         if (Order::where('id', $id)->exists()) {
-            $order = Order::find($id);
+            $order = Order::find($id)
+            ->join('users', 'orders.client_id', '=', 'users.id')
+            ->select('orders.*', 'users.email', 'users.name');
 
             $order->order_status_id = is_null($request->status) ? $order->order_status_id : $request->status;
 
             $order->save();
+
+            //No caso de um cancelamento, enviar email para o cliente para que ele saiba que seu pedido foi cancelado
+            if($request->status == 5) {
+                //Enviar e-mail para informar usuário do seu código de confirmação
+                $headerFields = array(
+                    "From: noreply@restaurantetcc.com.br",
+                    "Content-Type: text/html;charset=utf-8"
+                );
+
+                mail(
+                    $order->email,
+                    "Seu pedido foi cancelado",
+                    "Olá, " . $order->name . "<br>"
+                    . "Seu pedido para o Restaurante TCC foi cancelado! Lamentamos o incomodo.<br>",
+                    implode("\r\n", $headerFields)
+                );
+            }
 
             return response()->json([
                 "message" => "Atualizado com sucesso"
@@ -68,7 +87,7 @@ class OrderController extends Controller
     //Método para obter os pedidos em aberto de um cliente
     public function getClientOpenOrders($id)
     {
-        $orders = Order::where([['order_status_id', "!=", 5], ['client_id', $id]])
+        $orders = Order::where([['order_status_id', "!=", 5], ['order_status_id', "!=", 6], ['client_id', $id]])
         ->join('order_statuses', 'orders.order_status_id', '=', 'order_statuses.id')
         ->select('orders.*', 'order_statuses.name as status_name')
         ->get();

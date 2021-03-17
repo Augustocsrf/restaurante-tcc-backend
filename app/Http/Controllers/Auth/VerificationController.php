@@ -7,7 +7,7 @@ use Illuminate\Foundation\Auth\VerifiesEmails;
 
 use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Date;
+use Carbon\Carbon;
 
 class VerificationController extends Controller
 {
@@ -49,13 +49,15 @@ class VerificationController extends Controller
             ['id', $request->user->id]
         ])->exists();
 
+
         if($userExists){
             $user = $userExists = User::where([
                 ['confirmation_token', $request->code],
                 ['id', $request->user->id]
             ])->first();
 
-            $user->emaiL_verified_at = new Date();
+
+            $user->email_verified_at = Carbon::now();
 
             $user->save();
 

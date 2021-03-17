@@ -86,7 +86,7 @@ class RegisterController extends Controller
             'api_token' => Str::random(60),
         ]);
 
-        //Enviar e-mail para
+        //Enviar e-mail para informar usuário do seu código de confirmação
         $headerFields = array(
             "From: noreply@restaurantetcc.com.br",
             "Content-Type: text/html;charset=utf-8"
