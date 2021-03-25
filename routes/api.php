@@ -24,7 +24,6 @@ Route::post('recover-code', 'Auth\ForgotPasswordController@requestCode');
 Route::post('verify-code', 'Auth\ForgotPasswordController@verifyCode');
 
 //Reservas
-Route::get('reservations', 'ReservationController@index');
 Route::get('reservations/occupation', 'ReservationController@getBusyDays');
 Route::post('reservations', 'ReservationController@create');
 
@@ -61,7 +60,6 @@ Route::middleware('EnsureTokenIsValid:staff,admin')->group(function() {
 //Rotas protegidas apenas para administradores
 Route::middleware('EnsureTokenIsValid:admin')->group(function() {
     Route::get('items', 'ItemController@getProductList'); //Pegar produtos para a lista
-    Route::get('items/page/{page}', 'ItemController@getProductListPage'); //Pegar um certo número de items
     Route::post('items', 'ItemController@create'); //Criar novo item
     Route::put('items/{id}', 'ItemController@update'); //Atualizar item
     Route::delete('items/{id}', 'ItemController@delete'); //Deletar item

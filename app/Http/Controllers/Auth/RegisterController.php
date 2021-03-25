@@ -107,6 +107,14 @@ class RegisterController extends Controller
     //Método para criar um novo funcionário
     protected function createEmployee(Request $data)
     {
+        //Verificar se o email informado é o email de uma conta administrador ou funcionário
+        // Se sim, retornar erro de conflito
+        if(User::where([['email', $data->email], ['permission', '!=', '1']])->exists()){
+            return response()->json([
+                "message" => "Este email não é válido para cadastro de novos funcionários, selecione outro email, já estando em uso por outro.",
+            ], 409);
+        }
+
         //Verificar se o usuário com esse email já existe,
         // caso ele já exista, e o administrador não tenha dado permissão pra atualizar esse usuário, retornar erro
         // Caso haja essa permissão atualizar o usuário existente para ser um funcionário

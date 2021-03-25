@@ -9,11 +9,6 @@ use Illuminate\Http\Request;
 
 class ReservationController extends Controller
 {
-    public function index(){
-        $reservations = Reservation::get();
-        return response($reservations, 200);
-    }
-
     public function create(Request $request){
         //Verificar se uma reserva com o mesmo tempo, dia, e usuário já existe
         // Se sim, retornar um erro por conflito

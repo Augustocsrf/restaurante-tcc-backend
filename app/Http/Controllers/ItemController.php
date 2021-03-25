@@ -19,19 +19,6 @@ class ItemController extends Controller
         return response()->json($items, 200);
     }
 
-    public function getProductListPage($page){
-        $offset = 10 * ($page - 1);
-
-        $items = DB::table('items')
-        ->join('categories', 'categories.id', '=', 'items.category_id')
-        ->select('items.*', 'categories.active as category_active', 'categories.name as category_name')
-        ->offset($offset)
-        ->limit(10)
-        ->get();
-
-        return response()->json($items, 200);
-    }
-
     public function delete($id){
         if (Item::where('id', $id)->exists()) {
             $category = Item::find($id);
@@ -76,7 +63,7 @@ class ItemController extends Controller
     //Método para editar um item
     public function update(Request $request, $id)
     {
-        if(Item::where('name', $request->name)->exists()){
+        if(Item::where([['name', $request->name], ['id', "!=", $id]])->exists()){
             return response()->json([
                 "message" => "Produto com esse nome já existe"
             ], 409);
@@ -86,7 +73,7 @@ class ItemController extends Controller
             $item = Item::find($id);
 
             $item->name = is_null($request->name) ? $item->name : $request->name;
-            $item->description = is_null($request->description) ? $item->description : $request->description;
+            $item->description = $request->description;
             $item->price = is_null($request->price) ? $item->price : $request->price;
             $item->active = is_null($request->active) ? $item->active : $request->active;
             $item->category_id = is_null($request->categoryId) ? $item->category_id : $request->categoryId;

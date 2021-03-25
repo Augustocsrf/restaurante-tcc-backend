@@ -38,7 +38,6 @@ class AddressController extends Controller
         ], 201);
     }
 
-
     //Método para deletar um endereço
     public function delete($id)
     {
