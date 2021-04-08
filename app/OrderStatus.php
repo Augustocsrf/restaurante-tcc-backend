@@ -8,5 +8,5 @@ class OrderStatus extends Model
 {
     protected $table = 'order_statuses';
 
-    protected $fillable = [ "name" ];
+    protected $fillable = [ "name", "final" ];
 }

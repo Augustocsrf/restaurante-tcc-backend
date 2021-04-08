@@ -94,7 +94,7 @@ class RegisterController extends Controller
 
         mail(
             $user->email,
-            "Recuperação de Senha",
+            "Confirmação de E-mail",
             "Olá, " . $user->name . "<br>"
             . "Você se cadastrou no site RestauranteTCC.<br>"
             . "Para confirmar esse email, utilize o código <strong>" . $code . "</strong>.",

@@ -45,6 +45,7 @@ Route::middleware('EnsureTokenIsValid')->group(function() {
     //Rotas para Controller de Endereços
     Route::get('clients/{id}/addresses', 'AddressController@findByUser'); //Encontrar endereços de um cliente
     Route::post('addresses', 'AddressController@create'); //Criar um novo endereço
+    Route::put('addresses/{id}', 'AddressController@update'); //Editar um endereço
     Route::delete('addresses/{id}', 'AddressController@delete'); //Deletar um endereço
 });
 
@@ -75,6 +76,11 @@ Route::middleware('EnsureTokenIsValid:admin')->group(function() {
     Route::post('staff', 'Auth\RegisterController@createEmployee'); //Registrar funcionário
     Route::put('staff/{id}', 'StaffController@update'); //Deletar funcionário
     Route::delete('staff/{id}', 'StaffController@delete'); //Deletar funcionário
+
+    //Status de Pedido
+    Route::post('order-status', 'OrderStatusController@create'); //Criar status de pedidos
+    Route::put('order-status/{id}', 'OrderStatusController@update'); //Criar status de pedidos
+    Route::delete('order-status/{id}', 'OrderStatusController@delete'); //Criar status de pedidos
 
     //Reports
     Route::get('reports/revenue', 'DataReportController@getOrderRevenue');
